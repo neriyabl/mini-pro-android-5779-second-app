@@ -5,6 +5,7 @@ public class Driver {
     private String email;
     private String password;
     private String id;
+    private String email___password;
 
     // ----------- constructor --------
 
@@ -16,6 +17,7 @@ public class Driver {
         this.email = email;
         this.password = password;
         this.id = id;
+        this.email___password= email+"___"+password;
     }
 
     // -------- getter & setters -------
