@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
 import java.util.List;
 
 public class Firebase_DBManager implements Backend {
@@ -27,7 +28,13 @@ public class Firebase_DBManager implements Backend {
     private DatabaseReference driversRef = FirebaseDatabase.getInstance().getReference("drivers");
     private FirebaseAuth driverAuth;
 
-    private Driver dataToDriver(DataSnapshot dataSnapshot){
+
+    /**
+     * format the data from firebase to Driver user
+     * @param dataSnapshot the firebase ref
+     * @return new Driver
+     */
+    private Driver dataToDriver(DataSnapshot dataSnapshot) {
         return new Driver(
                 dataSnapshot.child("name").getValue().toString(),
                 dataSnapshot.child("email").getValue().toString(),
@@ -35,23 +42,23 @@ public class Firebase_DBManager implements Backend {
                 dataSnapshot.child("id").getValue().toString()
         );
     }
-    private ClientRequest dataToCLientRequest(DataSnapshot dataSnapshot){
-        return new ClientRequest(
+
+    private ClientRequest dataToCLientRequest(DataSnapshot dataSnapshot) {
+        ClientRequest request = new ClientRequest(
                 dataSnapshot.child("name").getValue().toString(),
                 dataSnapshot.child("phone").getValue().toString(),
-        dataSnapshot.child("email").getValue().toString(),
-                (ClientRequestStatus)dataSnapshot.child("ClientRequestStatus")
-                        .getValue()
-
-                //TODO
-        private String name;
-        private String phone;
-        private String email;
-        private ClientRequestStatus status;
-        private Location source;
-        private Location destination;
-
-        )
+                dataSnapshot.child("email").getValue().toString(),
+                (ClientRequestStatus) dataSnapshot.child("status").getValue(),
+                (Location) dataSnapshot.child("source").getValue(),
+                (Location) dataSnapshot.child("destination").getValue()
+        );
+        if (request.getStatus() == ClientRequestStatus.in_progress || request.getStatus() == ClientRequestStatus.close) {
+            request.setStartDrive((Date) dataSnapshot.child("startDrive").getValue());
+        }
+        if (request.getStatus() == ClientRequestStatus.close) {
+            request.setEndDrive((Date) dataSnapshot.child("endDrive").getValue());
+        }
+        return request;
     }
 
 
@@ -75,7 +82,7 @@ public class Firebase_DBManager implements Backend {
         final Driver[] driver = {null};
 
         Query query = driversRef.orderByChild("email___password")
-                .equalTo(email+"___"+password).limitToFirst(1);
+                .equalTo(email + "___" + password).limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -84,42 +91,31 @@ public class Firebase_DBManager implements Backend {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                //TODO
-                return;
+                driver[0] = null;
             }
         });
         return driver[0];
     }
 
     @Override
-    public List<ClientRequest> getRequest(int numRequest) {
-        final List<ClientRequest> clientRequests;
-        Query query = clientsRequestRef.limitToFirst(numRequest);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                clientRequests =
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    @Override
-    public List<ClientRequest> getRequest(int numRequest, int distance) {
+    public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
         return null;
     }
 
     @Override
-    public List<ClientRequest> getRequest(int numRequest, ClientRequestStatus status) {
+    public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance) {
         return null;
     }
 
     @Override
-    public List<ClientRequest> getRequest(int numRequest, int distance, ClientRequestStatus status) {
+    public List<ClientRequest> getRequest(Location driverLocation, int numRequest, ClientRequestStatus status) {
         return null;
     }
+
+    @Override
+    public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance, ClientRequestStatus status) {
+        return null;
+    }
+
+
 }

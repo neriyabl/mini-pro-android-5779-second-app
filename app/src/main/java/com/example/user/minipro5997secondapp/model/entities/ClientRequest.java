@@ -2,6 +2,8 @@ package com.example.user.minipro5997secondapp.model.entities;
 
 import android.location.Location;
 
+import java.util.Date;
+
 public class ClientRequest {
     private String name;
     private String phone;
@@ -9,6 +11,8 @@ public class ClientRequest {
     private ClientRequestStatus status;
     private Location source;
     private Location destination;
+    private Date startDrive;
+    private Date endDrive;
 
     // ------------ constructor ----------
 
@@ -22,6 +26,8 @@ public class ClientRequest {
         this.status = status;
         this.source = source;
         this.destination = destination;
+        this.startDrive = null;
+        this.endDrive = null;
     }
 
     // ----------- getters & setters ----------
@@ -73,5 +79,21 @@ public class ClientRequest {
 
     public void setDestination(Location destination) {
         this.destination = destination;
+    }
+
+    public Date getStartDrive() {
+        return startDrive;
+    }
+
+    public void setStartDrive(Date startDrive) {
+        this.startDrive = startDrive;
+    }
+
+    public Date getEndDrive() {
+        return endDrive;
+    }
+
+    public void setEndDrive(Date endDrive) {
+        this.endDrive = endDrive;
     }
 }
