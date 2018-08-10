@@ -3,6 +3,7 @@ package com.example.user.minipro5997secondapp.model.datasource;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.user.minipro5997secondapp.model.backend.Backend;
@@ -19,8 +20,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class Firebase_DBManager implements Backend {
 
@@ -31,6 +35,7 @@ public class Firebase_DBManager implements Backend {
 
     /**
      * format the data from firebase to Driver user
+     *
      * @param dataSnapshot the firebase ref
      * @return new Driver
      */
@@ -43,6 +48,12 @@ public class Firebase_DBManager implements Backend {
         );
     }
 
+    /**
+     * format the data from firebase to client request user
+     *
+     * @param dataSnapshot the firebase ref
+     * @return new client request
+     */
     private ClientRequest dataToCLientRequest(DataSnapshot dataSnapshot) {
         ClientRequest request = new ClientRequest(
                 dataSnapshot.child("name").getValue().toString(),
@@ -62,6 +73,7 @@ public class Firebase_DBManager implements Backend {
     }
 
 
+    // ------ implement's methods -----
     @Override
     public void addDriver(Driver driver, final Context context) {
         driversRef.push().setValue(driver).addOnSuccessListener(new OnSuccessListener() {
@@ -97,9 +109,27 @@ public class Firebase_DBManager implements Backend {
         return driver[0];
     }
 
+
+    //TODO sort by distance
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
-        return null;
+
+        final List<ClientRequest>[] requests = new List[]{new ArrayList<ClientRequest>()};
+
+        clientsRequestRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                requests[0].add(dataSnapshot.getValue(ClientRequest.class));
+                Log.d(TAG, "asdasdasd");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+            }
+        });
     }
 
     @Override
