@@ -11,8 +11,11 @@ public class ClientRequest {
     private ClientRequestStatus status;
     private Location source;
     private Location destination;
+
+
     private Date startDrive;
     private Date endDrive;
+    private Long id;
 
     // ------------ constructor ----------
 
@@ -95,5 +98,13 @@ public class ClientRequest {
 
     public void setEndDrive(Date endDrive) {
         this.endDrive = endDrive;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

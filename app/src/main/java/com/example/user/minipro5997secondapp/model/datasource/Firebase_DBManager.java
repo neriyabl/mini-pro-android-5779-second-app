@@ -3,7 +3,6 @@ package com.example.user.minipro5997secondapp.model.datasource;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.user.minipro5997secondapp.model.backend.Backend;
@@ -12,7 +11,7 @@ import com.example.user.minipro5997secondapp.model.entities.ClientRequestStatus;
 import com.example.user.minipro5997secondapp.model.entities.Driver;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,24 +19,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import static android.content.ContentValues.TAG;
 
 public class Firebase_DBManager implements Backend {
 
     private DatabaseReference clientsRequestRef = FirebaseDatabase.getInstance().getReference("clients");
     private DatabaseReference driversRef = FirebaseDatabase.getInstance().getReference("drivers");
-    private FirebaseAuth driverAuth;
+
+    private List<ClientRequest> requests;
+
 
 
     /**
@@ -82,13 +77,13 @@ public class Firebase_DBManager implements Backend {
     /**
      * sort the client requests by distance from the driver
      * @param driverLocation the driver location
-     * @param requests the list of all client requests
+     * @param _requests the list of all client requests
      * @return new sorted list
      */
-    private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> requests){
+    private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> _requests){
         Map<Double, ClientRequest> distanceMap = new HashMap<>();
         double distance;
-        for (ClientRequest request : requests) {
+        for (ClientRequest request : _requests) {
             distance = driverLocation.distanceTo(request.getSource());
             distanceMap.put(distance,request);
         }
@@ -132,28 +127,101 @@ public class Firebase_DBManager implements Backend {
         return driver[0];
     }
 
-
-    //TODO sort by distance
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
-
-        final List<ClientRequest> requests = clientsRequestRef.
+        return this.sortByDistance(driverLocation, requests).subList(0,numRequest-1);
     }
 
     @Override
-    public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance) {
-        return null;
+    public List<ClientRequest> getRequest(final Location driverLocation, int numRequest, final double distance) {
+        List<ClientRequest> requestList = new LinkedList<>(requests);
+        for (ClientRequest request : requestList)
+            if (request.getSource().distanceTo(driverLocation) >= distance)
+                requestList.remove(request);
+        return requestList.subList(0,numRequest-1);
     }
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest, ClientRequestStatus status) {
-        return null;
+        List<ClientRequest> requestList = new LinkedList<>(requests);
+        for (ClientRequest request : requestList)
+            if (request.getStatus() != status)
+                requestList.remove(request);
+        return requestList.subList(0,numRequest-1);
     }
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance, ClientRequestStatus status) {
-        return null;
+        List<ClientRequest> requestList = new LinkedList<>(requests);
+        for (ClientRequest request : requestList) {
+            if (request.getSource().distanceTo(driverLocation) >= distance || request.getStatus() != status)
+                requestList.remove(request);
+        }
+        return requestList.subList(0,numRequest-1);
     }
 
 
+
+    // the listener to the requests database
+    // --------- service ---------
+
+    public interface NotifyDataChange<T> {
+        void OnDataChanged(T obj);
+
+        void onFailure(Exception exception);
+    }
+
+    private ChildEventListener requestsRefChildEventListener;
+
+
+    private void notifyToStudentList(final NotifyDataChange<List<ClientRequest>> notifyDataChange) {
+        if (notifyDataChange != null) {
+
+            if (requestsRefChildEventListener != null) {
+                notifyDataChange.onFailure(new Exception("first unNotify ClientRequest list"));
+                return;
+            }
+            requests.clear();
+
+            requestsRefChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
+                    //TODO here the conditions
+                    String id = dataSnapshot.getKey();
+                    request.setId(Long.parseLong(id));
+                    requests.add(request);
+                    notifyDataChange.OnDataChanged(requests);
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
+                    Long id = Long.parseLong(dataSnapshot.getKey());
+
+                    for (int i = 0; i < requests.size(); i++) {
+                        if (requests.get(i).getId().equals(id)) {
+                            requests.set(i, request);
+                            break;
+                        }
+                    }
+                    notifyDataChange.OnDataChanged(requests);
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    notifyDataChange.onFailure(databaseError.toException());
+                }
+            };
+            clientsRequestRef.addChildEventListener(requestsRefChildEventListener);
+        }
+    }
 }

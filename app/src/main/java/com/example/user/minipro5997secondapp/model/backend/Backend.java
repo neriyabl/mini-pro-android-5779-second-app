@@ -16,7 +16,7 @@ public interface Backend {
 
     List<ClientRequest> getRequest(Location driverLocation, int numRequest);
 
-    List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance);
+    List<ClientRequest> getRequest(Location driverLocation, int numRequest, double distance);
 
     List<ClientRequest> getRequest(Location driverLocation, int numRequest, ClientRequestStatus status);
 
