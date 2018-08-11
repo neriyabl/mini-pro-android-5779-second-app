@@ -21,8 +21,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static android.content.ContentValues.TAG;
 
@@ -72,6 +79,22 @@ public class Firebase_DBManager implements Backend {
         return request;
     }
 
+    /**
+     * sort the client requests by distance from the driver
+     * @param driverLocation the driver location
+     * @param requests the list of all client requests
+     * @return new sorted list
+     */
+    private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> requests){
+        Map<Double, ClientRequest> distanceMap = new HashMap<>();
+        double distance;
+        for (ClientRequest request : requests) {
+            distance = driverLocation.distanceTo(request.getSource());
+            distanceMap.put(distance,request);
+        }
+        return (List<ClientRequest>) (new TreeMap<>(distanceMap)).values();
+    }
+
 
     // ------ implement's methods -----
     @Override
@@ -114,22 +137,7 @@ public class Firebase_DBManager implements Backend {
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
 
-        final List<ClientRequest>[] requests = new List[]{new ArrayList<ClientRequest>()};
-
-        clientsRequestRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                requests[0].add(dataSnapshot.getValue(ClientRequest.class));
-                Log.d(TAG, "asdasdasd");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-            }
-        });
+        final List<ClientRequest> requests = clientsRequestRef.
     }
 
     @Override
