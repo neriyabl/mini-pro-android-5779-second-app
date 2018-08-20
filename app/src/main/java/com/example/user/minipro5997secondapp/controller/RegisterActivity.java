@@ -52,6 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
                 backend.addDriver(new Driver(name.getText().toString(),
                         email.getText().toString(), password.getText().toString(),
                         id.getText().toString()),getApplicationContext());
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
     }

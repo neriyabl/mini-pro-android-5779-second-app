@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -47,7 +48,22 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
 
+    /**
+     * shared preferences vars
+     */
+    final String mypreference = "mypref";
+    final String Email = "Email";
+    final String Password = "Password";
+    SharedPreferences sharedpreferences;
+
+
     private Backend backend;
+
+
+    /**
+     * Id to identity READ_CONTACTS permission request.
+     */
+    private static final int REQUEST_READ_CONTACTS = 0;
 
 
     /**
@@ -69,8 +85,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
         //start service
-        if(service == null){
-            Intent intent =new Intent(LoginActivity.this, MyService.class);
+        if (service == null) {
+            Intent intent = new Intent(LoginActivity.this, MyService.class);
             startService(intent);
         }
 
@@ -101,6 +117,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        //register new driver button go to the register activity
         Button mRegisterButton = findViewById(R.id.register_button);
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -113,6 +130,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+
+        //check if there are shared preferences user
+        sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+        if (sharedpreferences.contains(Email)) {
+            mEmailView.setText(sharedpreferences.getString(Email,""));
+        }
+        if (sharedpreferences.contains(Password)) {
+            mPasswordView.setText(sharedpreferences.getString(Password, ""));
+        }
     }
 
     private void populateAutoComplete() {
@@ -315,7 +342,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, String, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
@@ -339,24 +366,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Driver user = backend.getDriver(driver);
                     if (user != null)
                         if (user.getId() != null) {
-
+                            driver = user;
+                            return true;
                         }
-                    return true;
                 }
             } catch (Exception e) {
                 return false;
             }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
+            publishProgress("Incorrect email or password.");
+            return false;
         }
 
         @Override
@@ -365,7 +383,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
+                saveSharedPreferences(driver);
+                Intent intent =new Intent(context,MainActivity.class);
+                intent.putExtra("driver_id",driver.getId());
+                intent.putExtra("driver_name",driver.getName());
+                intent.putExtra("driver_email",driver.getEmail());
+                startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -379,8 +402,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected void onProgressUpdate(Void... params) {
-            Toast.makeText(context, "lkjh", Toast.LENGTH_LONG).show();
+        protected void onProgressUpdate(String[] params) {
+            Toast.makeText(context, params[0], Toast.LENGTH_LONG).show();
+        }
+
+        private void saveSharedPreferences(Driver driver) {
+            try {
+
+                String emil = driver.getEmail();
+                String password = driver.getPassword();
+                sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putString(Email, emil);
+                editor.putString(Password, password);
+                editor.apply();
+
+                Toast.makeText(context, "save username and password Preferences", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception ex) {
+                Toast.makeText(context, "failed to save Preferences", Toast.LENGTH_SHORT).show();
+
+            }
         }
     }
 }
