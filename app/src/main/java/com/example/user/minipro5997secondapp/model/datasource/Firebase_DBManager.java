@@ -1,6 +1,7 @@
 package com.example.user.minipro5997secondapp.model.datasource;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
@@ -32,8 +33,6 @@ public class Firebase_DBManager implements Backend {
     private DatabaseReference driversRef = FirebaseDatabase.getInstance().getReference("drivers");
 
     private List<ClientRequest> requests;
-
-
 
     /**
      * format the data from firebase to Driver user
@@ -76,16 +75,17 @@ public class Firebase_DBManager implements Backend {
 
     /**
      * sort the client requests by distance from the driver
+     *
      * @param driverLocation the driver location
-     * @param _requests the list of all client requests
+     * @param _requests      the list of all client requests
      * @return new sorted list
      */
-    private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> _requests){
+    private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> _requests) {
         Map<Double, ClientRequest> distanceMap = new HashMap<>();
         double distance;
         for (ClientRequest request : _requests) {
             distance = driverLocation.distanceTo(request.getSource());
-            distanceMap.put(distance,request);
+            distanceMap.put(distance, request);
         }
         return (List<ClientRequest>) (new TreeMap<>(distanceMap)).values();
     }
@@ -108,28 +108,35 @@ public class Firebase_DBManager implements Backend {
     }
 
     @Override
-    public Driver getDriver(String email, String password) {
-        final Driver[] driver = {null};
+    public Driver getDriver(final Driver driver) {
+        final Driver[] drivers = {null};
+        String email = driver.getEmail();
+        String password = driver.getPassword();
+
 
         Query query = driversRef.orderByChild("email___password")
                 .equalTo(email + "___" + password).limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                driver[0] = dataToDriver(dataSnapshot);
+                if (dataSnapshot.exists())
+                    drivers[0] = dataSnapshot.getChildren().iterator().next().getValue(Driver.class);
+                else
+                    drivers[0] = new Driver();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                driver[0] = null;
+                drivers[0] = null;
             }
         });
-        return driver[0];
+        while (drivers[0]==null);
+        return drivers[0];
     }
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
-        return this.sortByDistance(driverLocation, requests).subList(0,numRequest-1);
+        return this.sortByDistance(driverLocation, requests).subList(0, numRequest - 1);
     }
 
     @Override
@@ -138,7 +145,7 @@ public class Firebase_DBManager implements Backend {
         for (ClientRequest request : requestList)
             if (request.getSource().distanceTo(driverLocation) >= distance)
                 requestList.remove(request);
-        return requestList.subList(0,numRequest-1);
+        return requestList.subList(0, numRequest - 1);
     }
 
     @Override
@@ -147,7 +154,7 @@ public class Firebase_DBManager implements Backend {
         for (ClientRequest request : requestList)
             if (request.getStatus() != status)
                 requestList.remove(request);
-        return requestList.subList(0,numRequest-1);
+        return requestList.subList(0, numRequest - 1);
     }
 
     @Override
@@ -157,9 +164,8 @@ public class Firebase_DBManager implements Backend {
             if (request.getSource().distanceTo(driverLocation) >= distance || request.getStatus() != status)
                 requestList.remove(request);
         }
-        return requestList.subList(0,numRequest-1);
+        return requestList.subList(0, numRequest - 1);
     }
-
 
 
     // the listener to the requests database
@@ -192,6 +198,10 @@ public class Firebase_DBManager implements Backend {
                     request.setId(Long.parseLong(id));
                     requests.add(request);
                     notifyDataChange.OnDataChanged(requests);
+                    Intent intent = new Intent("add new request");
+                    intent.putExtra("message", "you have new request");
+                    intent.setAction("newReq");
+                    //TODO a lot of coding
                 }
 
                 @Override

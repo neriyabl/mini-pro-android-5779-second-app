@@ -12,7 +12,7 @@ import java.util.List;
 public interface Backend {
     void addDriver(Driver driver, Context context);
 
-    Driver getDriver(String email, String password);
+    Driver getDriver(Driver driver);
 
     List<ClientRequest> getRequest(Location driverLocation, int numRequest);
 

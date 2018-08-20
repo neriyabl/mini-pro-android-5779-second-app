@@ -53,4 +53,21 @@ public class Driver {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getEmail___password() {
+        return email___password;
+    }
+
+    public void sxetEmail___password(String email___password) {
+        this.email___password = email___password;
+    }
+
+    // --------- methods -------
+
+    @Override
+    public String toString() {
+        return "name: " + name + "\n" +
+                "email: " + email + "\n"+
+                "id: " + id + ":\n";
+    }
 }
