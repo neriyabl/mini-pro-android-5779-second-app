@@ -1,7 +1,5 @@
 package com.example.user.minipro5997secondapp.model.entities;
 
-import android.location.Location;
-
 import java.util.Date;
 
 public class ClientRequest {
@@ -9,8 +7,9 @@ public class ClientRequest {
     private String phone;
     private String email;
     private ClientRequestStatus status;
-    private Location source;
-    private Location destination;
+    private Long sourceLatitude;
+    private Long sourceLongitude;
+    private Long destination;
 
 
     private Date startDrive;
@@ -22,17 +21,19 @@ public class ClientRequest {
     public ClientRequest() {
     }
 
-    public ClientRequest(String name, String phone, String email, ClientRequestStatus status, Location source, Location destination) {
+    public ClientRequest(String name, String phone, String email, ClientRequestStatus status, Long sourceLatitude,
+                         Long sourceLongitude, Long destination, Date startDrive, Date endDrive, Long id) {
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.status = status;
-        this.source = source;
+        this.sourceLatitude = sourceLatitude;
+        this.sourceLongitude = sourceLongitude;
         this.destination = destination;
-        this.startDrive = null;
-        this.endDrive = null;
+        this.startDrive = startDrive;
+        this.endDrive = endDrive;
+        this.id = id;
     }
-
     // ----------- getters & setters ----------
 
 
@@ -68,19 +69,27 @@ public class ClientRequest {
         this.status = status;
     }
 
-    public Location getSource() {
-        return source;
+    public Long getSourceLatitude() {
+        return sourceLatitude;
     }
 
-    public void setSource(Location source) {
-        this.source = source;
+    public void setSourceLatitude(Long sourceLatitude) {
+        this.sourceLatitude = sourceLatitude;
     }
 
-    public Location getDestination() {
+    public Long getSourceLongitude() {
+        return sourceLongitude;
+    }
+
+    public void setSourceLongitude(Long sourceLongitude) {
+        this.sourceLongitude = sourceLongitude;
+    }
+
+    public Long getDestination() {
         return destination;
     }
 
-    public void setDestination(Location destination) {
+    public void setDestination(Long destination) {
         this.destination = destination;
     }
 
