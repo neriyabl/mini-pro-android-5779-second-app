@@ -7,9 +7,9 @@ public class ClientRequest {
     private String phone;
     private String email;
     private ClientRequestStatus status;
-    private Long sourceLatitude;
-    private Long sourceLongitude;
-    private Long destination;
+    private double sourceLatitude;
+    private double sourceLongitude;
+    private String destination;
 
 
     private Date startDrive;
@@ -21,8 +21,8 @@ public class ClientRequest {
     public ClientRequest() {
     }
 
-    public ClientRequest(String name, String phone, String email, ClientRequestStatus status, Long sourceLatitude,
-                         Long sourceLongitude, Long destination, Date startDrive, Date endDrive, Long id) {
+    public ClientRequest(String name, String phone, String email, ClientRequestStatus status, double sourceLatitude,
+                         double sourceLongitude, String destination, Date startDrive, Date endDrive, Long id) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -69,27 +69,27 @@ public class ClientRequest {
         this.status = status;
     }
 
-    public Long getSourceLatitude() {
+    public double getSourceLatitude() {
         return sourceLatitude;
     }
 
-    public void setSourceLatitude(Long sourceLatitude) {
+    public void setSourceLatitude(double sourceLatitude) {
         this.sourceLatitude = sourceLatitude;
     }
 
-    public Long getSourceLongitude() {
+    public double getSourceLongitude() {
         return sourceLongitude;
     }
 
-    public void setSourceLongitude(Long sourceLongitude) {
+    public void setSourceLongitude(double sourceLongitude) {
         this.sourceLongitude = sourceLongitude;
     }
 
-    public Long getDestination() {
+    public String getDestination() {
         return destination;
     }
 
-    public void setDestination(Long destination) {
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 
