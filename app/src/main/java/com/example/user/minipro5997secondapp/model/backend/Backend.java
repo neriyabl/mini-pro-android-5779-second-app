@@ -14,6 +14,8 @@ public interface Backend {
 
     Driver getDriver(Driver driver);
 
+    List<ClientRequest> getAllRequest();
+
     List<ClientRequest> getRequest(Location driverLocation, int numRequest);
 
     List<ClientRequest> getRequest(Location driverLocation, int numRequest, double distance);

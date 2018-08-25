@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,6 +35,22 @@ public class Firebase_DBManager implements Backend {
 
     private List<ClientRequest> requests;
 
+    // ----- constructor -----
+    public Firebase_DBManager(){
+        requests = new ArrayList<>();
+        this.notifyToRequsetsList(new NotifyDataChange<List<ClientRequest>>() {
+            @Override
+            public void OnDataChanged(List<ClientRequest> obj) {
+                requests = obj;
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+           }
+        });
+    }
+
+    // ----- helpers methods -----
     /**
      * format the data from firebase to Driver user
      *
@@ -92,6 +109,14 @@ public class Firebase_DBManager implements Backend {
 
 
     // ------ implement's methods -----
+
+    //    --- the driver methods  ---
+
+    /**
+     * add new driver
+     * @param driver the driver with all details
+     * @param context the activity context
+     */
     @Override
     public void addDriver(Driver driver, final Context context) {
         driversRef.push().setValue(driver).addOnSuccessListener(new OnSuccessListener() {
@@ -107,6 +132,11 @@ public class Firebase_DBManager implements Backend {
         });
     }
 
+    /**
+     * get driver by email and password
+     * @param driver the driver with email and password
+     * @return if found new full driver else new empty driver
+     */
     @Override
     public Driver getDriver(final Driver driver) {
         final Driver[] drivers = {null};
@@ -133,6 +163,19 @@ public class Firebase_DBManager implements Backend {
         while (drivers[0]==null);
         return drivers[0];
     }
+
+
+    //    --- the client request methods  ---
+
+    /**
+     * get all request
+     * @return the requests list
+     */
+    @Override
+    public List<ClientRequest> getAllRequest(){
+        return requests;
+    }
+
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
@@ -169,7 +212,7 @@ public class Firebase_DBManager implements Backend {
 
 
     // the listener to the requests database
-    // --------- service ---------
+    // --------- listen to firebase requests changes  ---------
 
     public interface NotifyDataChange<T> {
         void OnDataChanged(T obj);
@@ -180,7 +223,7 @@ public class Firebase_DBManager implements Backend {
     private ChildEventListener requestsRefChildEventListener;
 
 
-    private void notifyToStudentList(final NotifyDataChange<List<ClientRequest>> notifyDataChange) {
+    private void notifyToRequsetsList(final NotifyDataChange<List<ClientRequest>> notifyDataChange) {
         if (notifyDataChange != null) {
 
             if (requestsRefChildEventListener != null) {
