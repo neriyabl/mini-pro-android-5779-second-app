@@ -43,7 +43,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         holder.name.setText(request.getName());
         holder.destinetion.setText(request.getDestination().toString());
-        holder.location.setText(request.getSource().toString());
+        holder.location.setText(request.getSourceLatitude() + " " + request.getSourceLongitude());
     }
 
     @Override

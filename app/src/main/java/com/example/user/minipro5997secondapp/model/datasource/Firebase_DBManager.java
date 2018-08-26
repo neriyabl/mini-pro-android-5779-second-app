@@ -3,6 +3,7 @@ package com.example.user.minipro5997secondapp.model.datasource;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
@@ -78,8 +79,9 @@ public class Firebase_DBManager implements Backend {
                 dataSnapshot.child("phone").getValue().toString(),
                 dataSnapshot.child("email").getValue().toString(),
                 (ClientRequestStatus) dataSnapshot.child("status").getValue(),
-                (Location) dataSnapshot.child("source").getValue(),
-                (Location) dataSnapshot.child("destination").getValue()
+                Double.parseDouble(dataSnapshot.child("sourceLatitude").getValue().toString()),
+                Double.parseDouble(dataSnapshot.child("sourceLongitude").getValue().toString()),
+                dataSnapshot.child("destination").getValue().toString()
         );
         if (request.getStatus() == ClientRequestStatus.in_progress || request.getStatus() == ClientRequestStatus.close) {
             request.setStartDrive((Date) dataSnapshot.child("startDrive").getValue());
@@ -100,8 +102,11 @@ public class Firebase_DBManager implements Backend {
     private List<ClientRequest> sortByDistance(Location driverLocation, List<ClientRequest> _requests) {
         Map<Double, ClientRequest> distanceMap = new HashMap<>();
         double distance;
+        Location loc = new Location(LocationManager.GPS_PROVIDER);
         for (ClientRequest request : _requests) {
-            distance = driverLocation.distanceTo(request.getSource());
+            loc.setLatitude(request.getSourceLatitude());
+            loc.setLongitude(request.getSourceLongitude());
+            distance = driverLocation.distanceTo(loc);
             distanceMap.put(distance, request);
         }
         return (List<ClientRequest>) (new TreeMap<>(distanceMap)).values();
@@ -185,9 +190,13 @@ public class Firebase_DBManager implements Backend {
     @Override
     public List<ClientRequest> getRequest(final Location driverLocation, int numRequest, final double distance) {
         List<ClientRequest> requestList = new LinkedList<>(requests);
-        for (ClientRequest request : requestList)
-            if (request.getSource().distanceTo(driverLocation) >= distance)
+        Location loc = new Location(LocationManager.GPS_PROVIDER);
+        for (ClientRequest request : requestList) {
+            loc.setLatitude(request.getSourceLatitude());
+            loc.setLongitude(request.getSourceLongitude());
+            if (loc.distanceTo(driverLocation) >= distance)
                 requestList.remove(request);
+        }
         return requestList.subList(0, numRequest - 1);
     }
 
@@ -203,8 +212,11 @@ public class Firebase_DBManager implements Backend {
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance, ClientRequestStatus status) {
         List<ClientRequest> requestList = new LinkedList<>(requests);
+        Location loc = new Location(LocationManager.GPS_PROVIDER);
         for (ClientRequest request : requestList) {
-            if (request.getSource().distanceTo(driverLocation) >= distance || request.getStatus() != status)
+            loc.setLatitude(request.getSourceLatitude());
+            loc.setLongitude(request.getSourceLongitude());
+            if (loc.distanceTo(driverLocation) >= distance || request.getStatus() != status)
                 requestList.remove(request);
         }
         return requestList.subList(0, numRequest - 1);
@@ -237,8 +249,7 @@ public class Firebase_DBManager implements Backend {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
                     //TODO here the conditions
-                    String id = dataSnapshot.getKey();
-                    request.setId(Long.parseLong(id));
+                    request.setId(dataSnapshot.getKey());
                     requests.add(request);
                     notifyDataChange.OnDataChanged(requests);
                     Intent intent = new Intent("add new request");
@@ -250,7 +261,7 @@ public class Firebase_DBManager implements Backend {
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
-                    Long id = Long.parseLong(dataSnapshot.getKey());
+                    String id = dataSnapshot.getKey();
 
                     for (int i = 0; i < requests.size(); i++) {
                         if (requests.get(i).getId().equals(id)) {

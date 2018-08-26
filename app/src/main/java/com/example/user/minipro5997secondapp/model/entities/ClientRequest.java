@@ -14,7 +14,7 @@ public class ClientRequest {
 
     private Date startDrive;
     private Date endDrive;
-    private Long id;
+    private String id;
 
     // ------------ constructor ----------
 
@@ -22,7 +22,7 @@ public class ClientRequest {
     }
 
     public ClientRequest(String name, String phone, String email, ClientRequestStatus status, double sourceLatitude,
-                         double sourceLongitude, String destination, Date startDrive, Date endDrive, Long id) {
+                         double sourceLongitude, String destination) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -30,9 +30,8 @@ public class ClientRequest {
         this.sourceLatitude = sourceLatitude;
         this.sourceLongitude = sourceLongitude;
         this.destination = destination;
-        this.startDrive = startDrive;
-        this.endDrive = endDrive;
-        this.id = id;
+        this.startDrive = null;
+        this.endDrive = null;
     }
     // ----------- getters & setters ----------
 
@@ -109,11 +108,11 @@ public class ClientRequest {
         this.endDrive = endDrive;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
