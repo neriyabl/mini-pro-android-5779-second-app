@@ -1,5 +1,6 @@
 package com.example.user.minipro5997secondapp.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import com.example.user.minipro5997secondapp.R;
 import com.example.user.minipro5997secondapp.controller.Adapters.RequestAdapter;
 import com.example.user.minipro5997secondapp.model.backend.Backend;
 import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
+import com.example.user.minipro5997secondapp.service.MyService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity
 
     Backend backend = BackendFactory.getBackend();
 
-
+    static MyService service = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        //start service
+        if (service == null) {
+            Intent intent = new Intent(MainActivity.this, MyService.class);
+            startService(intent);
+        }
+
 
         // ----- set the recycle view -----
         recyclerView = findViewById(R.id.recycleView);

@@ -248,7 +248,7 @@ public class Firebase_DBManager implements Backend {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
-                    //TODO here the conditions
+                    //TODO here the conditions for relevant requests
                     request.setId(dataSnapshot.getKey());
                     requests.add(request);
                     notifyDataChange.OnDataChanged(requests);

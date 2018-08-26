@@ -35,7 +35,6 @@ import com.example.user.minipro5997secondapp.R;
 import com.example.user.minipro5997secondapp.model.backend.Backend;
 import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
 import com.example.user.minipro5997secondapp.model.entities.Driver;
-import com.example.user.minipro5997secondapp.service.MyService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,18 +76,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
-    static MyService service = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //start service
-        if (service == null) {
-            Intent intent = new Intent(LoginActivity.this, MyService.class);
-            startService(intent);
-        }
+
 
         //get backend
         backend = BackendFactory.getBackend();
