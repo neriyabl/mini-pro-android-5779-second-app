@@ -82,7 +82,8 @@ public class Firebase_DBManager implements Backend {
                 (ClientRequestStatus) dataSnapshot.child("status").getValue(),
                 Double.parseDouble(dataSnapshot.child("sourceLatitude").getValue().toString()),
                 Double.parseDouble(dataSnapshot.child("sourceLongitude").getValue().toString()),
-                dataSnapshot.child("destination").getValue().toString()
+                Double.parseDouble(dataSnapshot.child("destinationLatitude").getValue().toString()),
+                Double.parseDouble(dataSnapshot.child("destinationLongitude").getValue().toString())
         );
         if (request.getStatus() == ClientRequestStatus.in_progress || request.getStatus() == ClientRequestStatus.close) {
             request.setStartDrive((Date) dataSnapshot.child("startDrive").getValue());

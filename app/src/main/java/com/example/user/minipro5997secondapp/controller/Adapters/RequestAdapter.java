@@ -2,6 +2,11 @@ package com.example.user.minipro5997secondapp.controller.Adapters;
 
 
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +18,8 @@ import com.example.user.minipro5997secondapp.R;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 
 import java.util.List;
+
+import static com.example.user.minipro5997secondapp.model.entities.geocoding.getAddressFromLocation;
 
 /**
  * RecycleView.Adapter
@@ -41,8 +48,19 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         ClientRequest request = clientRequests.get(position);
 
         holder.name.setText(request.getName());
-        holder.destinetion.setText(request.getDestination());
-        holder.location.setText(request.getSourceLatitude() + " " + request.getSourceLongitude());
+
+        Location dest = new Location(LocationManager.GPS_PROVIDER);
+        dest.setLatitude(request.getDestinationLatitude());
+        dest.setLongitude(request.getDestinationLongitude());
+        getAddressFromLocation(dest, context, new GeocoderHandler(holder.destinetion));
+
+        Location source = new Location(LocationManager.GPS_PROVIDER);
+        source.setLatitude(request.getSourceLatitude());
+        source.setLongitude(request.getSourceLongitude());
+        getAddressFromLocation(source,context,new GeocoderHandler(holder.location));
+
+       // holder.destinetion.setText(request.getDestination());
+       // holder.location.setText(request.getSourceLatitude() + " " + request.getSourceLongitude());
     }
 
     @Override
@@ -63,4 +81,32 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         }
     }
+
+
+
+    // handler to show the results of Geocoder in the UI:
+    private class GeocoderHandler extends Handler {
+
+        TextView view;
+
+        GeocoderHandler(TextView v){
+            view = v;
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            String result;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    result = bundle.getString("address");
+                    break;
+                default:
+                    result = null;
+            }
+            //update view
+            view.setText(result);
+        }
+    }
+
 }
