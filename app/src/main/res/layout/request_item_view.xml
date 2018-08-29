@@ -1,40 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<?xml version="1.0" encoding="utf-8"?><!--<android.support.constraint.ConstraintLayout--><!--xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:layout_width="match_parent"--><!--android:layout_height="fill_parent">-->
+
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:background="@drawable/card_background">
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="5dp">
-        <android.support.v7.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/nameItem"
-                android:textSize="20dp"
-                android:hint="name..."
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/nameItem"
+            android:layout_margin="10dp"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="name..."
+            android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/locationItem"
-                android:textSize="20dp"
-                android:hint="location..."
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/locationItem"
+            android:layout_margin="10dp"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="location..."
+            android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/destinationItem"
-                android:textSize="20dp"
-                android:hint="destination..."
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/destinationItem"
+            android:layout_margin="10dp"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="destination..."
+            android:textSize="20dp" />
 
-        </android.support.v7.widget.LinearLayoutCompat>
-    </android.support.v7.widget.CardView>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
 
-</android.support.constraint.ConstraintLayout>
+    <!--</android.support.constraint.ConstraintLayout>-->

@@ -339,7 +339,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        private final Context context;
         private Driver driver;
 
         UserLoginTask(String email, String password, Context _context) {
@@ -348,7 +347,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             driver = new Driver();
             driver.setEmail(email);
             driver.setPassword(password);
-            context = _context;
         }
 
         @Override
@@ -377,7 +375,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 saveSharedPreferences(driver);
-                Intent intent =new Intent(context,MainActivity.class);
+                Intent intent =new Intent(LoginActivity.this,MainActivity.class);
                 intent.putExtra("driver_id",driver.getId());
                 intent.putExtra("driver_name",driver.getName());
                 intent.putExtra("driver_email",driver.getEmail());
@@ -396,7 +394,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected void onProgressUpdate(String[] params) {
-            Toast.makeText(context, params[0], Toast.LENGTH_LONG).show();
+            Toast.makeText(LoginActivity.this, params[0], Toast.LENGTH_LONG).show();
         }
 
         private void saveSharedPreferences(Driver driver) {
@@ -410,10 +408,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString(Password, password);
                 editor.apply();
 
-                Toast.makeText(context, "save username and password Preferences", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "save username and password Preferences", Toast.LENGTH_SHORT).show();
             }
             catch (Exception ex) {
-                Toast.makeText(context, "failed to save Preferences", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "failed to save Preferences", Toast.LENGTH_SHORT).show();
 
             }
         }

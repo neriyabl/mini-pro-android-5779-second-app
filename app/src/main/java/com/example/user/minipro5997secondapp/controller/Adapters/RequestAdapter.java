@@ -32,9 +32,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @NonNull
     @Override
     public RequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.request_item_view , null);
-        return new RequestViewHolder(view);
+        View v = LayoutInflater.from(context).inflate(R.layout.request_item_view, parent, false);
+        return new RequestViewHolder(v);
     }
 
     @Override
@@ -42,7 +41,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         ClientRequest request = clientRequests.get(position);
 
         holder.name.setText(request.getName());
-        holder.destinetion.setText(request.getDestination().toString());
+        holder.destinetion.setText(request.getDestination());
         holder.location.setText(request.getSourceLatitude() + " " + request.getSourceLongitude());
     }
 
@@ -61,6 +60,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             name = itemView.findViewById(R.id.nameItem);
             location = itemView.findViewById(R.id.locationItem);
             destinetion =itemView.findViewById(R.id.destinationItem);
+
         }
     }
 }
