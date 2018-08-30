@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +31,10 @@ public class geocoding {
                         Address address = list.get(0);
                         // sending back first address line and locality
                         result = address.getAddressLine(0) + ", " + address.getLocality();
+                    }
+                    else if(list != null){
+                        DecimalFormat format = new DecimalFormat("##.####");
+                        result = "cant parse: "+format.format(location.getLatitude()) +" , " + format.format(location.getLongitude());
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Impossible to connect to Geocoder", e);

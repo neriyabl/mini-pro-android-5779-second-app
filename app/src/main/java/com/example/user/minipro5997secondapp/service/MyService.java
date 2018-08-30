@@ -11,8 +11,6 @@ import com.example.user.minipro5997secondapp.model.datasource.Firebase_DBManager
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class MyService extends Service {
 
@@ -22,7 +20,6 @@ public class MyService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         dbManager = (Firebase_DBManager) BackendFactory.getBackend();
         context = getApplicationContext();
         dbManager.notifyToRequsetsList(new Firebase_DBManager.NotifyDataChange<List<ClientRequest>>() {

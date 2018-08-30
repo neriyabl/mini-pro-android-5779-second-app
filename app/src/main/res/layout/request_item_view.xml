@@ -16,29 +16,58 @@
 
         <TextView
             android:id="@+id/nameItem"
-            android:layout_margin="10dp"
-            android:layout_width="300dp"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="name..."
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            android:textColor="@color/text_items"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
 
         <TextView
             android:id="@+id/locationItem"
-            android:layout_margin="10dp"
-            android:layout_width="300dp"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="location..."
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            android:textColor="@color/text_items"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
 
         <TextView
             android:id="@+id/destinationItem"
-            android:layout_margin="10dp"
-            android:layout_width="300dp"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="destination..."
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            android:textColor="@color/text_items"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/phoneItem"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="phone..."
+            android:textSize="20dp"
+            android:textColor="@color/text_items"
+            android:autoLink="phone"/>
 
     </LinearLayout>
+
 </android.support.v7.widget.CardView>
 
     <!--</android.support.constraint.ConstraintLayout>-->

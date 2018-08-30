@@ -2,8 +2,10 @@ package com.example.user.minipro5997secondapp.controller.Adapters;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,6 +20,7 @@ import com.example.user.minipro5997secondapp.R;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 
 import java.util.List;
+import java.util.Locale;
 
 import static com.example.user.minipro5997secondapp.model.entities.geocoding.getAddressFromLocation;
 
@@ -47,20 +50,42 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         ClientRequest request = clientRequests.get(position);
 
+        //set the name
         holder.name.setText(request.getName());
 
-        Location dest = new Location(LocationManager.GPS_PROVIDER);
+        //set the destination
+        final Location dest = new Location(LocationManager.GPS_PROVIDER);
         dest.setLatitude(request.getDestinationLatitude());
         dest.setLongitude(request.getDestinationLongitude());
-        getAddressFromLocation(dest, context, new GeocoderHandler(holder.destinetion));
+        getAddressFromLocation(dest, context, new GeocoderHandler(holder.destination));
+        holder.destination.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String uri = String.format(Locale.ENGLISH, "geo:%f,%f", dest.getLatitude(), dest.getLongitude());
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(intent);
+            }
+        });
 
-        Location source = new Location(LocationManager.GPS_PROVIDER);
+
+        //set the destination
+        final Location source = new Location(LocationManager.GPS_PROVIDER);
         source.setLatitude(request.getSourceLatitude());
         source.setLongitude(request.getSourceLongitude());
         getAddressFromLocation(source,context,new GeocoderHandler(holder.location));
+        holder.location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String uri = String.format(Locale.ENGLISH, "geo:%f,%f", source.getLatitude(), source.getLongitude());
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(intent);
+            }
+        });
 
-       // holder.destinetion.setText(request.getDestination());
-       // holder.location.setText(request.getSourceLatitude() + " " + request.getSourceLongitude());
+
+        //set the phone
+        holder.phone.setText(request.getPhone());
+
     }
 
     @Override
@@ -70,19 +95,17 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     class RequestViewHolder extends RecyclerView.ViewHolder{
 
-        TextView name, location, destinetion;
+        TextView name, location, destination, phone;
 
         public RequestViewHolder(View itemView) {
             super(itemView);
 
             name = itemView.findViewById(R.id.nameItem);
             location = itemView.findViewById(R.id.locationItem);
-            destinetion =itemView.findViewById(R.id.destinationItem);
-
+            destination =itemView.findViewById(R.id.destinationItem);
+            phone = itemView.findViewById(R.id.phoneItem);
         }
     }
-
-
 
     // handler to show the results of Geocoder in the UI:
     private class GeocoderHandler extends Handler {
@@ -102,7 +125,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                     result = bundle.getString("address");
                     break;
                 default:
-                    result = null;
+                    result = "can't parse the location";
             }
             //update view
             view.setText(result);
