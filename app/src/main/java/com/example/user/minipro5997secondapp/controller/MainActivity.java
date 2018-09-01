@@ -75,7 +75,9 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.content_frame, new RequestsFragment())
                     .commit();
         } else if (id == R.id.nav_exit) {
-            
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, new ExitFragment())
+                    .commit();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

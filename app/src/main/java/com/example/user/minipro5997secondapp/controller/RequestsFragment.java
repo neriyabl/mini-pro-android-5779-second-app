@@ -31,8 +31,11 @@ public class RequestsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
+        getActivity().setTitle("MY REQUESTS");
+
         adapter = new RequestAdapter(view.getContext(), backend.getAllRequest());
         recyclerView.setAdapter(adapter);
+
         return view;
     }
 }

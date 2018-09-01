@@ -13,7 +13,8 @@ import com.example.user.minipro5997secondapp.R;
 public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context,LoginActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder b = new NotificationCompat.Builder(context);
 
@@ -27,8 +28,11 @@ public class MyReceiver extends BroadcastReceiver {
                 .setContentIntent(contentIntent)
                 .setContentInfo("Info");
 
+
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, b.build());
+
+
 
     }
 }
