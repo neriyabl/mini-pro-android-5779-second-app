@@ -68,6 +68,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         });
 
 
+
         //set the destination
         final Location source = new Location(LocationManager.GPS_PROVIDER);
         source.setLatitude(request.getSourceLatitude());
