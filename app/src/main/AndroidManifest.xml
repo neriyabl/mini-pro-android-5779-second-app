@@ -26,6 +26,7 @@
         <activity android:name=".controller.RegisterActivity"
             android:label="Register"/>
 
+        <!-- my service -->
         <service
             android:name=".service.MyService"
             android:enabled="true"
