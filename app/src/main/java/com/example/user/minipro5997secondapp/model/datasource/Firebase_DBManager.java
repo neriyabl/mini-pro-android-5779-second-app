@@ -1,7 +1,6 @@
 package com.example.user.minipro5997secondapp.model.datasource;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -42,7 +41,9 @@ public class Firebase_DBManager implements Backend {
         this.notifyToRequsetsList(new NotifyDataChange<List<ClientRequest>>() {
             @Override
             public void OnDataChanged(List<ClientRequest> obj) {
-                requests = obj;
+                if(requests != obj) {
+                    requests = obj;
+                }
             }
 
             @Override
@@ -81,7 +82,8 @@ public class Firebase_DBManager implements Backend {
                 (ClientRequestStatus) dataSnapshot.child("status").getValue(),
                 Double.parseDouble(dataSnapshot.child("sourceLatitude").getValue().toString()),
                 Double.parseDouble(dataSnapshot.child("sourceLongitude").getValue().toString()),
-                dataSnapshot.child("destination").getValue().toString()
+                Double.parseDouble(dataSnapshot.child("destinationLatitude").getValue().toString()),
+                Double.parseDouble(dataSnapshot.child("destinationLongitude").getValue().toString())
         );
         if (request.getStatus() == ClientRequestStatus.in_progress || request.getStatus() == ClientRequestStatus.close) {
             request.setStartDrive((Date) dataSnapshot.child("startDrive").getValue());
@@ -233,14 +235,42 @@ public class Firebase_DBManager implements Backend {
     }
 
     private ChildEventListener requestsRefChildEventListener;
+    private ChildEventListener serviceListener;
 
 
-    private void notifyToRequsetsList(final NotifyDataChange<List<ClientRequest>> notifyDataChange) {
+    public void notifyToRequsetsList(final NotifyDataChange<List<ClientRequest>> notifyDataChange) {
         if (notifyDataChange != null) {
 
             if (requestsRefChildEventListener != null) {
-                notifyDataChange.onFailure(new Exception("first unNotify ClientRequest list"));
-                return;
+                if(serviceListener!=null){
+                    notifyDataChange.onFailure(new Exception("first unNotify ClientRequest list"));
+                    return;
+                } else {
+                    serviceListener = new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
+                            notifyDataChange.OnDataChanged(requests);
+                        }
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        }
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    };
+                    clientsRequestRef.addChildEventListener(serviceListener);
+                    return;
+                }
             }
             requests.clear();
 
@@ -252,10 +282,6 @@ public class Firebase_DBManager implements Backend {
                     request.setId(dataSnapshot.getKey());
                     requests.add(request);
                     notifyDataChange.OnDataChanged(requests);
-                    Intent intent = new Intent("add new request");
-                    intent.putExtra("message", "you have new request");
-                    intent.setAction("newReq");
-                    //TODO a lot of coding
                 }
 
                 @Override
@@ -273,15 +299,25 @@ public class Firebase_DBManager implements Backend {
                 }
 
                 @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    //ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
+                    String id = dataSnapshot.getKey();
+
+                    for (int i = 0; i < requests.size(); i++) {
+                        if (requests.get(i).getId().equals(id)) {
+                            requests.remove(i);
+                            break;
+                        }
+                    }
+                    notifyDataChange.OnDataChanged(requests);
                 }
 
                 @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void onCancelled(@NonNull DatabaseError databaseError) {
                     notifyDataChange.onFailure(databaseError.toException());
                 }
             };

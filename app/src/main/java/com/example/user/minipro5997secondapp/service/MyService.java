@@ -1,33 +1,43 @@
 package com.example.user.minipro5997secondapp.service;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.IBinder;
 
 import com.example.user.minipro5997secondapp.controller.MyReceiver;
 import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
+import com.example.user.minipro5997secondapp.model.datasource.Firebase_DBManager;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 public class MyService extends Service {
 
     private int lastCount = 0;
     Context context;
+    Firebase_DBManager dbManager;
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        //ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        repeatingAlarmCreation();
+        dbManager = (Firebase_DBManager) BackendFactory.getBackend();
         context = getApplicationContext();
-        return START_STICKY;
-       // return super.onStartCommand(intent, flags, startId);
+        dbManager.notifyToRequsetsList(new Firebase_DBManager.NotifyDataChange<List<ClientRequest>>() {
+            @Override
+            public void OnDataChanged(List<ClientRequest> obj) {
+                try {
+                    Intent intent = new Intent(context, MyReceiver.class);
+                    sendBroadcast(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+            }
+        });
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -35,38 +45,4 @@ public class MyService extends Service {
         return null;
     }
 
-    private void repeatingAlarmCreation() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            @SuppressLint("StaticFieldLeak")
-            public void run() {
-
-                new AsyncTask<Void, Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground(Void... params) {
-
-                        try {
-                            ArrayList<ClientRequest> reservations = new ArrayList<>(BackendFactory.getBackend().getAllRequest());
-                            if (lastCount < reservations.size()) {
-                                lastCount = reservations.size();
-                                Intent intent = new Intent(context, MyReceiver.class);
-                                sendBroadcast(intent);
-
-                            }} catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
-                    }
-                }.execute();
-
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-    }
 }
