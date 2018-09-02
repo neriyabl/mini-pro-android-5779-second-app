@@ -53,7 +53,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         //set the name
         holder.name.setText(request.getName());
 
-        //set the destination
+        //set the destination location
         final Location dest = new Location(LocationManager.GPS_PROVIDER);
         dest.setLatitude(request.getDestinationLatitude());
         dest.setLongitude(request.getDestinationLongitude());
@@ -69,7 +69,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
 
 
-        //set the destination
+        //set the source location
         final Location source = new Location(LocationManager.GPS_PROVIDER);
         source.setLatitude(request.getSourceLatitude());
         source.setLongitude(request.getSourceLongitude());
