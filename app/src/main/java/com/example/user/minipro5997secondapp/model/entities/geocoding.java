@@ -16,6 +16,10 @@ import java.util.Locale;
 
 import static android.support.constraint.Constraints.TAG;
 
+
+/**
+ * this class convert a lat long to address in another thread
+ */
 public class geocoding {
 
     public static void getAddressFromLocation(
@@ -34,7 +38,8 @@ public class geocoding {
                     }
                     else if(list != null){
                         DecimalFormat format = new DecimalFormat("##.####");
-                        result = "cant parse: "+format.format(location.getLatitude()) +" , " + format.format(location.getLongitude());
+                        result = "cant parse: "+format.format(location.getLatitude()) +" , " + format.format(location.getLongitude())
+                                + "\nClick to see the location on the map";
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Impossible to connect to Geocoder", e);
