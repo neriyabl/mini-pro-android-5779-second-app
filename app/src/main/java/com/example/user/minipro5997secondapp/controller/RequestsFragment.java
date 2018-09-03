@@ -1,5 +1,6 @@
 package com.example.user.minipro5997secondapp.controller;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,14 +14,21 @@ import com.example.user.minipro5997secondapp.R;
 import com.example.user.minipro5997secondapp.controller.Adapters.RequestAdapter;
 import com.example.user.minipro5997secondapp.model.backend.Backend;
 import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
+import com.example.user.minipro5997secondapp.model.entities.Driver;
 
+@SuppressLint("ValidFragment")
 public class RequestsFragment extends Fragment {
 
     View view;
     RecyclerView recyclerView;
     RequestAdapter adapter;
-
     Backend backend = BackendFactory.getBackend();
+    Driver driver;
+
+    @SuppressLint("ValidFragment")
+    RequestsFragment(Driver driver){
+        this.driver = driver;
+    }
 
     @Nullable
     @Override
@@ -33,7 +41,7 @@ public class RequestsFragment extends Fragment {
 
         getActivity().setTitle("MY REQUESTS");
 
-        adapter = new RequestAdapter(view.getContext(), backend.getAllRequest());
+        adapter = new RequestAdapter(view.getContext(), backend.getAllRequest(),driver);
         recyclerView.setAdapter(adapter);
 
         return view;

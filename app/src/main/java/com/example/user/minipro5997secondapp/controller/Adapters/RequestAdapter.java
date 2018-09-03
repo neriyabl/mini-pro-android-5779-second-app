@@ -1,7 +1,9 @@
 package com.example.user.minipro5997secondapp.controller.Adapters;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
@@ -20,7 +22,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.user.minipro5997secondapp.R;
+import com.example.user.minipro5997secondapp.model.backend.Backend;
+import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
+import com.example.user.minipro5997secondapp.model.entities.ClientRequestStatus;
+import com.example.user.minipro5997secondapp.model.entities.Driver;
 
 import java.util.List;
 import java.util.Locale;
@@ -35,11 +41,14 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     private Context context;
     private List<ClientRequest> clientRequests;
+    private Backend backend;
+    private Driver driver;
 
     // constructor
-    public RequestAdapter(Context context, List<ClientRequest> clientRequests) {
+    public RequestAdapter(Context context, List<ClientRequest> clientRequests, Driver driver) {
         this.context = context;
         this.clientRequests = clientRequests;
+        this.driver = driver;
     }
 
     @NonNull
@@ -50,8 +59,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RequestViewHolder holder, int position) {
         final ClientRequest request = clientRequests.get(position);
+        backend = BackendFactory.getBackend();
 
         //set the name
         holder.name.setText(request.getName());
@@ -112,12 +122,35 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             });
         }
 
+        //set on click ti take drive
+        holder.takeDrive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(driver.getName() + " are you sure you want to take the drive" +
+                        "\nfrom: " + holder.location.getText() + "\nto: " + holder.destination.getText())
+                        .setTitle("Take Drive");
+                builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        backend.changeStatus(request.getId(),driver, ClientRequestStatus.close,context);
+                    }
+                });
+                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     /**
      * check if the phone already exist in the contracts
+     *
      * @param context the activity context
-     * @param number the number to check
+     * @param number  the number to check
      * @return bool exist or not
      */
     private boolean contactExists(Context context, String number) {
@@ -145,7 +178,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     class RequestViewHolder extends RecyclerView.ViewHolder {
 
         TextView name, location, destination, phone;
-        Button addContact;
+        Button addContact, takeDrive;
 
         public RequestViewHolder(View itemView) {
             super(itemView);
@@ -156,6 +189,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             phone = itemView.findViewById(R.id.phoneItem);
 
             addContact = itemView.findViewById(R.id.saveContact);
+            takeDrive = itemView.findViewById(R.id.takeDrive);
         }
     }
 

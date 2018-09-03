@@ -82,7 +82,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
 
-
         //get backend
         backend = BackendFactory.getBackend();
 
@@ -128,7 +127,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //check if there are shared preferences user
         sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
         if (sharedpreferences.contains(Email)) {
-            mEmailView.setText(sharedpreferences.getString(Email,""));
+            mEmailView.setText(sharedpreferences.getString(Email, ""));
         }
         if (sharedpreferences.contains(Password)) {
             mPasswordView.setText(sharedpreferences.getString(Password, ""));
@@ -355,11 +354,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
                 if (backend != null) {
                     Driver user = backend.getDriver(driver);
-                    if (user != null)
-                        if (user.getId() != null) {
-                            driver = user;
-                            return true;
-                        }
+                    if (user.getId() != null) {
+                        driver = user;
+                        return true;
+                    }
                 }
             } catch (Exception e) {
                 return false;
@@ -375,10 +373,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 saveSharedPreferences(driver);
-                Intent intent =new Intent(LoginActivity.this,MainActivity.class);
-                intent.putExtra("driver_id",driver.getId());
-                intent.putExtra("driver_name",driver.getName());
-                intent.putExtra("driver_email",driver.getEmail());
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("driver_id", driver.getId())
+                        .putExtra("driver_name", driver.getName())
+                        .putExtra("driver_email", driver.getEmail());
+
                 startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -409,8 +408,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.apply();
 
                 Toast.makeText(LoginActivity.this, "save username and password Preferences", Toast.LENGTH_SHORT).show();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Toast.makeText(LoginActivity.this, "failed to save Preferences", Toast.LENGTH_SHORT).show();
 
             }

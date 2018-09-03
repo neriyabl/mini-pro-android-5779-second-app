@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.user.minipro5997secondapp.R;
+import com.example.user.minipro5997secondapp.model.entities.Driver;
 import com.example.user.minipro5997secondapp.service.MyService;
 
 public class MainActivity extends AppCompatActivity
@@ -19,12 +20,18 @@ public class MainActivity extends AppCompatActivity
 
 
     static MyService service = null;
+    private Driver driver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent thisIntent = getIntent();
+        driver = new Driver();
+        driver.setId(thisIntent.getStringExtra("driver_id"));
+        driver.setName(thisIntent.getStringExtra("driver_name"));
+        driver.setEmail(thisIntent.getStringExtra("driver_email"));
 
         //   from the default nav activity
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -43,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         // ----- set the recycle view -----
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, new RequestsFragment())
+                .replace(R.id.content_frame, new RequestsFragment(driver))
                 .commit();
 
         //start service
@@ -72,7 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_requests) {
             fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, new RequestsFragment())
+                    .replace(R.id.content_frame, new RequestsFragment(driver))
                     .commit();
         } else if (id == R.id.nav_exit) {
             fragmentManager.beginTransaction()

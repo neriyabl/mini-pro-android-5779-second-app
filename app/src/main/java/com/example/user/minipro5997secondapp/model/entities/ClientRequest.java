@@ -13,6 +13,7 @@ public class ClientRequest {
     private double destinationLongitude;
 
 
+    private String driverID;
     private Date startDrive;
     private Date endDrive;
     private String id;
@@ -100,6 +101,14 @@ public class ClientRequest {
 
     public void setDestinationLongitude(double destinationLongitude) {
         this.destinationLongitude = destinationLongitude;
+    }
+
+    public String getDriverID() {
+        return driverID;
+    }
+
+    public void setDriverID(String driverID) {
+        this.driverID = driverID;
     }
 
     public Date getStartDrive() {

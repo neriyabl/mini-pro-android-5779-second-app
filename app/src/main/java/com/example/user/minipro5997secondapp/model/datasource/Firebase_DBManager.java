@@ -3,7 +3,9 @@ package com.example.user.minipro5997secondapp.model.datasource;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.widget.Toast;
 
 import com.example.user.minipro5997secondapp.model.backend.Backend;
@@ -27,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class Firebase_DBManager implements Backend {
 
@@ -183,9 +186,12 @@ public class Firebase_DBManager implements Backend {
      *
      * @return the requests list
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public List<ClientRequest> getAllRequest() {
-        return requests;
+        return requests.stream()
+                .filter(p -> p.getStatus() == ClientRequestStatus.wait)
+                .collect(Collectors.toList());
     }
 
 
@@ -230,20 +236,26 @@ public class Firebase_DBManager implements Backend {
     }
 
     @Override
-    public void changeStatus(String requestID, Driver driver, final ClientRequestStatus status, final Context context) {
-        clientsRequestRef.child(requestID).child("status").setValue(status)
+    public void changeStatus(String requestID,Driver driver, final ClientRequestStatus status, final Context context) {
+        clientsRequestRef.child(requestID).child("driverID").setValue(driver.getId())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "the status update to: " + status, Toast.LENGTH_LONG);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, "fail to update the status", Toast.LENGTH_LONG);
-                    }
-                });
+            @Override
+            public void onSuccess(Void aVoid) {
+                clientsRequestRef.child("status").setValue(status)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(context, "the status update to: " + status, Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(context, "fail to update the status", Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+        });
     }
 
 

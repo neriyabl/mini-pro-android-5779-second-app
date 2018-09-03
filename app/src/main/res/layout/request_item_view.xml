@@ -82,6 +82,13 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp" />
         </LinearLayout>
+        <Button
+            android:id="@+id/takeDrive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="take this drive"
+            android:textSize="15sp"
+            android:textColor="@color/colorPrimaryDark"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
