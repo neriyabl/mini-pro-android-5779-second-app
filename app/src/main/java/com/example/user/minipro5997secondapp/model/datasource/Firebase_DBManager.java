@@ -36,23 +36,24 @@ public class Firebase_DBManager implements Backend {
     private List<ClientRequest> requests;
 
     // ----- constructor -----
-    public Firebase_DBManager(){
+    public Firebase_DBManager() {
         requests = new ArrayList<>();
         this.notifyToRequsetsList(new NotifyDataChange<List<ClientRequest>>() {
             @Override
             public void OnDataChanged(List<ClientRequest> obj) {
-                if(requests != obj) {
+                if (requests != obj) {
                     requests = obj;
                 }
             }
 
             @Override
             public void onFailure(Exception exception) {
-           }
+            }
         });
     }
 
     // ----- helpers methods -----
+
     /**
      * format the data from firebase to Driver user
      *
@@ -121,7 +122,8 @@ public class Firebase_DBManager implements Backend {
 
     /**
      * add new driver
-     * @param driver the driver with all details
+     *
+     * @param driver  the driver with all details
      * @param context the activity context
      */
     @Override
@@ -141,12 +143,14 @@ public class Firebase_DBManager implements Backend {
 
     /**
      * get driver by email and password
+     *
      * @param driver the driver with email and password
      * @return if found new full driver else new empty driver
      */
     @Override
     public Driver getDriver(final Driver driver) {
-        final Driver[] drivers = {null};
+        final Driver[] drivers = new Driver[1];
+        drivers[0] = null;
         String email = driver.getEmail();
         String password = driver.getPassword();
 
@@ -167,7 +171,7 @@ public class Firebase_DBManager implements Backend {
                 drivers[0] = null;
             }
         });
-        while (drivers[0]==null);
+        while (drivers[0] == null) ;
         return drivers[0];
     }
 
@@ -176,10 +180,11 @@ public class Firebase_DBManager implements Backend {
 
     /**
      * get all request
+     *
      * @return the requests list
      */
     @Override
-    public List<ClientRequest> getAllRequest(){
+    public List<ClientRequest> getAllRequest() {
         return requests;
     }
 
@@ -224,6 +229,23 @@ public class Firebase_DBManager implements Backend {
         return requestList.subList(0, numRequest - 1);
     }
 
+    @Override
+    public void changeStatus(String requestID, Driver driver, final ClientRequestStatus status, final Context context) {
+        clientsRequestRef.child(requestID).child("status").setValue(status)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context, "the status update to: " + status, Toast.LENGTH_LONG);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context, "fail to update the status", Toast.LENGTH_LONG);
+                    }
+                });
+    }
+
 
     // the listener to the requests database
     // --------- listen to firebase requests changes  ---------
@@ -242,30 +264,30 @@ public class Firebase_DBManager implements Backend {
         if (notifyDataChange != null) {
 
             if (requestsRefChildEventListener != null) {
-                if(serviceListener!=null){
+                if (serviceListener != null) {
                     notifyDataChange.onFailure(new Exception("first unNotify ClientRequest list"));
                     return;
                 } else {
                     serviceListener = new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
                             notifyDataChange.OnDataChanged(requests);
                         }
+
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                         }
+
                         @Override
                         public void onChildRemoved(DataSnapshot dataSnapshot) {
-
                         }
+
                         @Override
                         public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                         }
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
                         }
                     };
                     clientsRequestRef.addChildEventListener(serviceListener);

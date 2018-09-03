@@ -23,4 +23,6 @@ public interface Backend {
     List<ClientRequest> getRequest(Location driverLocation, int numRequest, ClientRequestStatus status);
 
     List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance, ClientRequestStatus status);
+
+    void changeStatus(String requestID, Driver driver, ClientRequestStatus status, Context context);
 }
