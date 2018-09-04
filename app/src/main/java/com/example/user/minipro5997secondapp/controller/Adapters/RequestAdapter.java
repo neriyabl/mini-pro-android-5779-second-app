@@ -34,8 +34,13 @@ import java.util.Locale;
 import static com.example.user.minipro5997secondapp.model.entities.geocoding.getAddressFromLocation;
 
 /**
- * RecycleView.Adapter
- * RecycleView.ViewHolder
+ *  <p>
+ *  RecyclerView.Adapter
+ *  RecyclerView.ViewHolder
+ *  </p>
+ *
+ * <p>adapter to a requests list
+ * @see <a href="https://developer.android.com/guide/topics/ui/layout/recyclerview">recycler view</a>
  */
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
@@ -44,40 +49,58 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     private Backend backend;
     private Driver driver;
 
-    // constructor
+    /**
+     * the constructor take 3 params
+     * @param context the parent context
+     * @param clientRequests the list of all requests
+     * @param driver the drive user details
+     */
     public RequestAdapter(Context context, List<ClientRequest> clientRequests, Driver driver) {
         this.context = context;
         this.clientRequests = clientRequests;
         this.driver = driver;
+        this.backend = BackendFactory.getBackend();
     }
+
 
     @NonNull
     @Override
     public RequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //create a request item view and initialize with RequestViewHolder
         View v = LayoutInflater.from(context).inflate(R.layout.request_item_view, parent, false);
         return new RequestViewHolder(v);
     }
 
+    /**
+     * <p>initialize the view holder</p>
+     *
+     * @see <a href="https://developers.google.com/maps/documentation/urls/android-intents">open map by intent</a>
+     * @see <a href="https://developer.android.com/training/contacts-provider/modify-data">adding contract</a>
+     * @see <a href="https://developer.android.com/guide/topics/ui/dialogs">Dialogs</a>
+     * @param holder the view holder request view
+     * @param position the index of this holder in the recycler view
+     */
     @Override
     public void onBindViewHolder(@NonNull final RequestViewHolder holder, int position) {
+        //a single request from the list
         final ClientRequest request = clientRequests.get(position);
-        backend = BackendFactory.getBackend();
 
-        //set the name
+        //set the name text view
         holder.name.setText(request.getName());
 
-        //set the destination location
+        //set the destination location text view
         final Location dest = new Location(LocationManager.GPS_PROVIDER);
         dest.setLatitude(request.getDestinationLatitude());
         dest.setLongitude(request.getDestinationLongitude());
+        // get the address for the destination
+        // using the help class GeocoderHandler in this class
+        // and the method getAddressFromLocation in geocoding class
         getAddressFromLocation(dest, context, new GeocoderHandler(holder.destination));
-        holder.destination.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String uri = String.format(Locale.ENGLISH, "geo:%f,%f", dest.getLatitude(), dest.getLongitude());
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                context.startActivity(intent);
-            }
+        // set on click open the location in the map
+        holder.destination.setOnClickListener(v -> {
+            String uri = String.format(Locale.ENGLISH, "geo:%f,%f", dest.getLatitude(), dest.getLongitude());
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            context.startActivity(intent);
         });
 
 
@@ -85,14 +108,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         final Location source = new Location(LocationManager.GPS_PROVIDER);
         source.setLatitude(request.getSourceLatitude());
         source.setLongitude(request.getSourceLongitude());
+        // get the address for the source
+        // using the help class GeocoderHandler in this class
+        // and the method getAddressFromLocation in geocoding class
         getAddressFromLocation(source, context, new GeocoderHandler(holder.location));
-        holder.location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String uri = String.format(Locale.ENGLISH, "geo:%f,%f", source.getLatitude(), source.getLongitude());
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                context.startActivity(intent);
-            }
+        // set on click open the location in the map
+        holder.location.setOnClickListener(v -> {
+            String uri = String.format(Locale.ENGLISH, "geo:%f,%f", source.getLatitude(), source.getLongitude());
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            context.startActivity(intent);
         });
 
 
@@ -103,49 +127,44 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         if (contactExists(context, request.getPhone())) {
             holder.addContact.setVisibility(View.GONE);
         } else {
-            holder.addContact.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Creates a new Intent to insert a contact
-                    Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
-                    // Sets the MIME type to match the Contacts Provider
-                    intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+            holder.addContact.setOnClickListener(v -> {
+                // Creates a new Intent to insert a contact
+                Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
+                // Sets the MIME type to match the Contacts Provider
+                intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+                // send the phone and name to the adding contract activity
+                intent.putExtra(ContactsContract.Intents.Insert.PHONE, request.getPhone())
+                        .putExtra(ContactsContract.Intents.Insert.NAME, request.getName())
+                        //this need to return the app after the user save the contract
+                        .putExtra("finishActivityOnSaveCompleted", true);
 
-                    intent.putExtra(ContactsContract.Intents.Insert.PHONE, request.getPhone())
-                            .putExtra(ContactsContract.Intents.Insert.NAME, request.getName())
-                            .putExtra("finishActivityOnSaveCompleted", true);
+                context.startActivity(intent);
 
-                    context.startActivity(intent);
-
-                    v.setClickable(false);
-                }
+                v.setClickable(false);
             });
         }
 
-        //set on click ti take drive
-        holder.takeDrive.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("StaticFieldLeak")
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(driver.getName() + " are you sure you want to take the drive" +
-                        "\nfrom: " + holder.location.getText() + "\nto: " + holder.destination.getText())
-                        .setTitle("Take Drive");
+        //set on click to take drive
+        holder.takeDrive.setOnClickListener(v -> {
+            //open dialog to sure its ok
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(driver.getName() + " are you sure you want to take the drive" +
+                    "\nfrom: " + holder.location.getText() + "\nto: " + holder.destination.getText())
+                    .setTitle("Take Drive");
 
-                builder.setPositiveButton("ok", (dialog, id) ->
-                        backend.changeStatus(request.getId(),driver, ClientRequestStatus.close,context));
+            builder.setPositiveButton("ok", (dialog, id) ->
+                    backend.changeStatus(request.getId(),driver, ClientRequestStatus.close,context));
 
-                builder.setNegativeButton("cancel", (dialog, id) -> { });
+            builder.setNegativeButton("cancel", (dialog, id) -> { });
 
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
     }
 
     /**
      * check if the phone already exist in the contracts
-     *
+     * @see <a href="https://stackoverflow.com/questions/3505865/android-check-phone-number-present-in-contact-list-phone-number-retrieve-fr">stackoverflow</a>
      * @param context the activity context
      * @param number  the number to check
      * @return bool exist or not
@@ -172,12 +191,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         return clientRequests.size();
     }
 
+    /**
+     * the view holder class
+     * to hold one request in the recycler
+     */
     class RequestViewHolder extends RecyclerView.ViewHolder {
 
         TextView name, location, destination, phone;
         Button addContact, takeDrive;
 
-        public RequestViewHolder(View itemView) {
+        /**
+         * constructor to find the views in the itemView
+         * @param itemView a single item View
+         */
+        RequestViewHolder(View itemView) {
             super(itemView);
 
             name = itemView.findViewById(R.id.nameItem);
@@ -190,15 +217,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         }
     }
 
-    // handler to show the results of Geocoder in the UI:
+    /**
+     * handler to show the results of Geocoder in the UI:
+     */
+    @SuppressLint("HandlerLeak")
     private class GeocoderHandler extends Handler {
 
         TextView view;
 
+        //the view to handle
         GeocoderHandler(TextView v) {
             view = v;
         }
 
+        //showing result geocoding
         @Override
         public void handleMessage(Message message) {
             String result;
