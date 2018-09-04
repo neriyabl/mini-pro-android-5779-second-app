@@ -1,18 +1,17 @@
 package com.example.user.minipro5997secondapp.model.datasource;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.widget.Toast;
 
 import com.example.user.minipro5997secondapp.model.backend.Backend;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequestStatus;
 import com.example.user.minipro5997secondapp.model.entities.Driver;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -131,17 +130,9 @@ public class Firebase_DBManager implements Backend {
      */
     @Override
     public void addDriver(Driver driver, final Context context) {
-        driversRef.push().setValue(driver).addOnSuccessListener(new OnSuccessListener() {
-            @Override
-            public void onSuccess(Object o) {
-                Toast.makeText(context, "Success to add the request", Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "Fail to add the request", Toast.LENGTH_LONG).show();
-            }
-        });
+        driversRef.push().setValue(driver)
+                .addOnSuccessListener((OnSuccessListener<Object>) o -> Toast.makeText(context, "Success to add the request", Toast.LENGTH_LONG).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "Fail to add the request", Toast.LENGTH_LONG).show());
     }
 
     /**
@@ -186,7 +177,7 @@ public class Firebase_DBManager implements Backend {
      *
      * @return the requests list
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     @Override
     public List<ClientRequest> getAllRequest() {
         return requests.stream()
@@ -236,36 +227,22 @@ public class Firebase_DBManager implements Backend {
     }
 
     @Override
-    public void changeStatus(String requestID,Driver driver, final ClientRequestStatus status, final Context context) {
-        clientsRequestRef.child(requestID).child("driverID").setValue(driver.getId())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                clientsRequestRef.child("status").setValue(status)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(context, "the status update to: " + status, Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(context, "fail to update the status", Toast.LENGTH_LONG).show();
-                            }
-                        });
-            }
-        });
+    public void changeStatus(String requestID, Driver driver, final ClientRequestStatus status, final Context context) {
+        clientsRequestRef.child(requestID).child("driverID").setValue(driver.getId());
+        clientsRequestRef.child(requestID).child("status").setValue(status)
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, "the status update to: " + status, Toast.LENGTH_LONG).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "fail to update the status", Toast.LENGTH_LONG).show());
     }
 
 
-    // the listener to the requests database
-    // --------- listen to firebase requests changes  ---------
+// the listener to the requests database
+// --------- listen to firebase requests changes  ---------
 
     public interface NotifyDataChange<T> {
         void OnDataChanged(T obj);
 
         void onFailure(Exception exception);
+
     }
 
     private ChildEventListener requestsRefChildEventListener;

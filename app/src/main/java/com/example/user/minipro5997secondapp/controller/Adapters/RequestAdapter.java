@@ -1,9 +1,9 @@
 package com.example.user.minipro5997secondapp.controller.Adapters;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
@@ -124,22 +124,19 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         //set on click ti take drive
         holder.takeDrive.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(driver.getName() + " are you sure you want to take the drive" +
                         "\nfrom: " + holder.location.getText() + "\nto: " + holder.destination.getText())
                         .setTitle("Take Drive");
-                builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        backend.changeStatus(request.getId(),driver, ClientRequestStatus.close,context);
-                    }
-                });
-                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
-                });
+
+                builder.setPositiveButton("ok", (dialog, id) ->
+                        backend.changeStatus(request.getId(),driver, ClientRequestStatus.close,context));
+
+                builder.setNegativeButton("cancel", (dialog, id) -> { });
+
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
