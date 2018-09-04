@@ -28,12 +28,12 @@ public class ExitFragment extends Fragment {
 
         exit = view.findViewById(R.id.exitB);
         exit.setOnClickListener(v -> {
-            //set intent to go the home activity of the user phone
+            //set intent to go the home screen of the user phone
             //because not all activity in the app closing in getActivity().finish() or System.exit(0)
             Intent homeIntent = new Intent(Intent.ACTION_MAIN);
             homeIntent.addCategory(Intent.CATEGORY_HOME);
             homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            //go to the home
+            //go to the home screen
             startActivity(homeIntent);
 
             //exit from this activity (return to login activity)
