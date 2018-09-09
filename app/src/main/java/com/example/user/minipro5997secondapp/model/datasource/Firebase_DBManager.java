@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Firebase_DBManager implements Backend {
@@ -114,7 +113,7 @@ public class Firebase_DBManager implements Backend {
             distance = driverLocation.distanceTo(loc);
             distanceMap.put(distance, request);
         }
-        return (List<ClientRequest>) (new TreeMap<>(distanceMap)).values();
+        return new ArrayList<>(distanceMap.values());
     }
 
 
@@ -188,7 +187,8 @@ public class Firebase_DBManager implements Backend {
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
-        return this.sortByDistance(driverLocation, requests).subList(0, numRequest - 1);
+        return this.sortByDistance(driverLocation, requests).subList(0,
+                this.requests.size()>numRequest?numRequest - 1:this.requests.size()-1);
     }
 
     @Override
