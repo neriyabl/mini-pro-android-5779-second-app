@@ -135,6 +135,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 // send the phone and name to the adding contract activity
                 intent.putExtra(ContactsContract.Intents.Insert.PHONE, request.getPhone())
                         .putExtra(ContactsContract.Intents.Insert.NAME, request.getName())
+                        .putExtra(ContactsContract.Intents.Insert.EMAIL, request.getEmail())
                         //this need to return the app after the user save the contract
                         .putExtra("finishActivityOnSaveCompleted", true);
 

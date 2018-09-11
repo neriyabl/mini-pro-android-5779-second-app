@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // ----- set the recycle view -----
+        // ----- set the request list view -----
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, new RequestsFragment(driver))
@@ -71,18 +71,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         FragmentManager fragmentManager = getFragmentManager();
 
+        //show the request list fragment
         if (id == R.id.nav_requests) {
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, new RequestsFragment(driver))
                     .commit();
-        } else if (id == R.id.nav_exit) {
+        }
+        //show the exit fragment
+        else if (id == R.id.nav_exit) {
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, new ExitFragment())
                     .commit();

@@ -43,11 +43,10 @@ public class RequestsFragment extends Fragment {
     Driver driver;
     Location driverLocation;
 
-    //the service provider to get the client location
+    //the service provider to get the driver location
     private FusedLocationProviderClient mFusedLocationClient;
 
 
-    @SuppressLint("ValidFragment")
     RequestsFragment(Driver driver) {
         this.driver = driver;
     }
@@ -72,8 +71,8 @@ public class RequestsFragment extends Fragment {
         // ---- set the filter ----
         filter = view.findViewById(R.id.spinner);
         String[] items = new String[]{"all", "500", "250", "100", "50"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_dropdown_item, items);
-        filter.setAdapter(adapter);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_dropdown_item, items);
+        filter.setAdapter(arrayAdapter);
 
         filter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @SuppressLint("StaticFieldLeak")

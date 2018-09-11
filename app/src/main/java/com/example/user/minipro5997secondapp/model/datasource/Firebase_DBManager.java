@@ -1,5 +1,4 @@
 package com.example.user.minipro5997secondapp.model.datasource;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.location.Location;
