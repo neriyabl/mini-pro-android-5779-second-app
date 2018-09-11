@@ -188,7 +188,7 @@ public class Firebase_DBManager implements Backend {
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest) {
         return this.sortByDistance(driverLocation, requests).subList(0,
-                this.requests.size()>numRequest?numRequest - 1:this.requests.size()-1);
+                this.requests.size()>numRequest?numRequest:this.requests.size());
     }
 
     @Override
@@ -201,7 +201,7 @@ public class Firebase_DBManager implements Backend {
             if (loc.distanceTo(driverLocation)/1000 <= distance)
                 requestList.add(request);
         }
-        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest: requestList.size());
     }
 
     @Override
@@ -210,7 +210,7 @@ public class Firebase_DBManager implements Backend {
         for (ClientRequest request : requests)
             if (request.getStatus() == status)
                 requestList.add(request);
-        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest: requestList.size());
     }
 
     @Override
@@ -223,7 +223,7 @@ public class Firebase_DBManager implements Backend {
             if (loc.distanceTo(driverLocation)/1000 <= distance && request.getStatus() == status)
                 requestList.add(request);
         }
-        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest: requestList.size());
     }
 
     @Override
