@@ -2,15 +2,9 @@ package com.example.user.minipro5997secondapp.controller;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,11 +22,10 @@ import com.example.user.minipro5997secondapp.model.backend.BackendFactory;
 import com.example.user.minipro5997secondapp.model.entities.ClientRequest;
 import com.example.user.minipro5997secondapp.model.entities.Driver;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("ValidFragment")
-public class RequestsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class RequestsFragment extends Fragment {
 
     View view;
     RecyclerView recyclerView;
@@ -40,7 +33,6 @@ public class RequestsFragment extends Fragment implements LoaderManager.LoaderCa
     Spinner filter;
     Backend backend = BackendFactory.getBackend();
     Driver driver;
-    RequestTask mAsyncTask;
 
     @SuppressLint("ValidFragment")
     RequestsFragment(Driver driver) {
@@ -61,12 +53,9 @@ public class RequestsFragment extends Fragment implements LoaderManager.LoaderCa
         adapter = new RequestAdapter(view.getContext(), backend.getAllRequest(), driver);
         recyclerView.setAdapter(adapter);
 
-
-        mAsyncTask = new RequestTask();
-
         // ---- set the filter ----
         filter = view.findViewById(R.id.spinner);
-        String[] items = new String[]{"100", "50", "25", "10"};
+        String[] items = new String[]{"all", "1000", "500", "250", "100", "50"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_dropdown_item, items);
         filter.setAdapter(adapter);
 
@@ -77,12 +66,8 @@ public class RequestsFragment extends Fragment implements LoaderManager.LoaderCa
                 Location location = new Location("gps");
                 location.setLatitude(31.77);
                 location.setLongitude(35.177);
-                // backend.getRequest(location,100,Double.parseDouble(items[position]))
-//                List request = backend.getAllRequest();
-//                recyclerView.setAdapter(new RequestAdapter(view.getContext(), request, driver));
-                Location location1[] = new Location[1];
-                location1[0] = location;
-                mAsyncTask.execute(location1);
+
+                new RequestTask().execute(location);
 
             }
 
@@ -100,7 +85,11 @@ public class RequestsFragment extends Fragment implements LoaderManager.LoaderCa
 
         @Override
         protected Void doInBackground(Location... locations) {
-            requests = backend.getRequest(locations[0], 100);
+            if (filter.getSelectedItem().toString().equals("all")) {
+                requests = backend.getAllRequest();
+            } else {
+                requests = backend.getRequest(locations[0], 100, Double.parseDouble(filter.getSelectedItem().toString()));
+            }
             return null;
         }
 
@@ -108,50 +97,5 @@ public class RequestsFragment extends Fragment implements LoaderManager.LoaderCa
         protected void onPostExecute(Void aVoid) {
             recyclerView.setAdapter(new RequestAdapter(view.getContext(), requests, driver));
         }
-    }
-
-
-    ///     --------------------------------------------------------------------          /////////
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(),
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 }

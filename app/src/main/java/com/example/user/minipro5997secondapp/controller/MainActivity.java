@@ -2,7 +2,9 @@ package com.example.user.minipro5997secondapp.controller;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,8 +24,16 @@ public class MainActivity extends AppCompatActivity
     static MyService service = null;
     private Driver driver;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //start service
+        if (service == null) {
+            Intent intent = new Intent(getBaseContext(), MyService.class);
+            startService(intent);
+            service = getSystemService(MyService.class);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -46,18 +56,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         // ----- set the recycle view -----
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, new RequestsFragment(driver))
                 .commit();
 
-        //start service
-        if (service == null) {
-            Intent intent = new Intent(getBaseContext(), MyService.class);
-            startService(intent);
-        }
     }
 
     @Override

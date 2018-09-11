@@ -193,37 +193,37 @@ public class Firebase_DBManager implements Backend {
 
     @Override
     public List<ClientRequest> getRequest(final Location driverLocation, int numRequest, final double distance) {
-        List<ClientRequest> requestList = new LinkedList<>(requests);
+        List<ClientRequest> requestList = new LinkedList<>();
         Location loc = new Location(LocationManager.GPS_PROVIDER);
-        for (ClientRequest request : requestList) {
+        for (ClientRequest request : requests) {
             loc.setLatitude(request.getSourceLatitude());
             loc.setLongitude(request.getSourceLongitude());
-            if (loc.distanceTo(driverLocation) >= distance)
-                requestList.remove(request);
+            if (loc.distanceTo(driverLocation)/1000 <= distance)
+                requestList.add(request);
         }
-        return requestList.subList(0, numRequest - 1);
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
     }
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest, ClientRequestStatus status) {
-        List<ClientRequest> requestList = new LinkedList<>(requests);
-        for (ClientRequest request : requestList)
-            if (request.getStatus() != status)
-                requestList.remove(request);
-        return requestList.subList(0, numRequest - 1);
+        List<ClientRequest> requestList = new LinkedList<>();
+        for (ClientRequest request : requests)
+            if (request.getStatus() == status)
+                requestList.add(request);
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
     }
 
     @Override
     public List<ClientRequest> getRequest(Location driverLocation, int numRequest, int distance, ClientRequestStatus status) {
-        List<ClientRequest> requestList = new LinkedList<>(requests);
+        List<ClientRequest> requestList = new LinkedList<>();
         Location loc = new Location(LocationManager.GPS_PROVIDER);
-        for (ClientRequest request : requestList) {
+        for (ClientRequest request : requests) {
             loc.setLatitude(request.getSourceLatitude());
             loc.setLongitude(request.getSourceLongitude());
-            if (loc.distanceTo(driverLocation) >= distance || request.getStatus() != status)
-                requestList.remove(request);
+            if (loc.distanceTo(driverLocation)/1000 <= distance && request.getStatus() == status)
+                requestList.add(request);
         }
-        return requestList.subList(0, numRequest - 1);
+        return requestList.subList(0,requestList.size()>=numRequest? numRequest - 1: requestList.size());
     }
 
     @Override
@@ -302,6 +302,7 @@ public class Firebase_DBManager implements Backend {
 
                     for (int i = 0; i < requests.size(); i++) {
                         if (requests.get(i).getId().equals(id)) {
+                            request.setId(id);
                             requests.set(i, request);
                             break;
                         }
