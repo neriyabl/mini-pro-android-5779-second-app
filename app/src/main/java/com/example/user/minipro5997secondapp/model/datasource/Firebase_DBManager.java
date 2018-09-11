@@ -1,6 +1,5 @@
 package com.example.user.minipro5997secondapp.model.datasource;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -176,12 +175,14 @@ public class Firebase_DBManager implements Backend {
      *
      * @return the requests list
      */
-    @TargetApi(Build.VERSION_CODES.N)
+   // @TargetApi(Build.VERSION_CODES.N)
     @Override
     public List<ClientRequest> getAllRequest() {
-        return requests.stream()
-                .filter(p -> p.getStatus() == ClientRequestStatus.wait)
-                .collect(Collectors.toList());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return requests.stream()
+                    .filter(p -> p.getStatus() == ClientRequestStatus.wait)
+                    .collect(Collectors.toList());
+        }else return requests;
     }
 
 
@@ -312,7 +313,6 @@ public class Firebase_DBManager implements Backend {
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    //ClientRequest request = dataSnapshot.getValue(ClientRequest.class);
                     String id = dataSnapshot.getKey();
 
                     for (int i = 0; i < requests.size(); i++) {

@@ -1,10 +1,9 @@
 package com.example.user.minipro5997secondapp.controller;
 
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,17 +20,15 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    static MyService service = null;
+    static ComponentName service = null;
     private Driver driver;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //start service
         if (service == null) {
             Intent intent = new Intent(getBaseContext(), MyService.class);
-            startService(intent);
-            service = getSystemService(MyService.class);
+            service = startService(intent);
         }
 
         super.onCreate(savedInstanceState);
