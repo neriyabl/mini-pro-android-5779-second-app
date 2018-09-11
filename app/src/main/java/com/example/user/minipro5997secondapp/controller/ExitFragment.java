@@ -24,8 +24,10 @@ public class ExitFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.exit_layout, container, false);
 
+        //set the title
         getActivity().setTitle("Exit");
 
+        // exit button
         exit = view.findViewById(R.id.exitB);
         exit.setOnClickListener(v -> {
             //set intent to go the home screen of the user phone
