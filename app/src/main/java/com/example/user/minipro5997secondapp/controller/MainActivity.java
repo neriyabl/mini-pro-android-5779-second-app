@@ -1,6 +1,7 @@
 package com.example.user.minipro5997secondapp.controller;
 
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -19,11 +20,17 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    static MyService service = null;
+    static ComponentName service = null;
     private Driver driver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //start service
+        if (service == null) {
+            Intent intent = new Intent(getBaseContext(), MyService.class);
+            service = startService(intent);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -46,18 +53,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         // ----- set the recycle view -----
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, new RequestsFragment(driver))
                 .commit();
 
-        //start service
-        if (service == null) {
-            Intent intent = new Intent(getBaseContext(), MyService.class);
-            startService(intent);
-        }
     }
 
     @Override
